@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  mongo:
+    image: mongo:4.2
+    container_name: mongo
+    ports:
+      - 27018:27017
+  rabbitMQ:
+    image: rabbitmq:3.10
+    container_name: rabbitMQ
+    ports:
+      - 5672:5672
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: micro-streaming-analytics
+    container_name: micro-streaming-analytics
+    depends_on:
+      - mongo
+      - rabbitMQ
+    environment:
+      - SPRING_DATA_MONGODB_HOST=mongo
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=local
+      - SPRING_RABBITMQ_HOST=rabbitMQ
+      - SPRING_RABBITMQ_PORT=5672
+    restart: on-failure
